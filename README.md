@@ -1,9 +1,14 @@
 # MVP_BackEnd
- Implementar um BackEnd como MVP
+ ```
+ O objetivo é a entrega do MVP que tem como escopo a implementação de um backEnd, com 3x rotas de API e uma tabela de roupas para cadastro, busca e deleção
+ ```
+ 
+```
+Para executar os comandos estamos utilizando um ambiente virtual env.
+```
  
  (env)$ pip install -r requirements.txt
 ```
-
 Este comando instala as dependências/bibliotecas, descritas no arquivo `requirements.txt`.
 
 Para executar a API  basta executar:
