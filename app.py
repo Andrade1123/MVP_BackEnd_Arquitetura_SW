@@ -3,18 +3,19 @@ from sqlalchemy.exc import IntegrityError
 from flask_cors import CORS
 from flask import redirect
 
-from model import Session, Produto
+from model import Session
+from model.Roupa import Roupa
 from schemas import *
 
 
-info = Info(title="Minha API", version="1.0.0")
+info = Info(title="API de Roupa", version="1.0.0")
 app = OpenAPI(__name__, info=info)
 CORS(app)
 
 
 # definindo tags
 home_tag = Tag(name="Documentação", description="Seleção de documentação: Swagger, Redoc ou RapiDoc")
-produto_tag = Tag(name="Produto", description="Adição, visualização e remoção de produtos à base")
+roupa_tag = Tag(name="Roupa", description="Adição, visualização e remoção de roupas à base")
 
 
 @app.get('/', tags=[home_tag])
@@ -24,30 +25,30 @@ def home():
     return redirect('/openapi')
 
 
-@app.post('/produto', tags=[produto_tag],
-          responses={"200": ProdutoViewSchema, "409": ErrorSchema, "400": ErrorSchema})
-def add_produto(form: ProdutoSchema):
-    """Adiciona um novo Produto à base de dados
+@app.post('/roupa', tags=[roupa_tag],
+          responses={"200": RoupaViewSchema, "409": ErrorSchema, "400": ErrorSchema})
+def add_roupa(form: RoupaSchema):
+    """Adiciona um nova Roupa à base de dados
 
-    Retorna uma representação dos produtos e comentários associados.
+    Retorna uma representação das roupas.
     """
-    produto = Produto(
-        nome=form.nome,
+    roupa = Roupa(
+        categoria=form.categoria,
         quantidade=form.quantidade,
-        valor=form.valor)
+        valor=form.valor, tamanho=form.tamanho)
 
     try:
         # criando conexão com a base
         session = Session()
-        # adicionando produto
-        session.add(produto)
+        # adicionando roupa
+        session.add(roupa)
         # efetivando o camando de adição de novo item na tabela
         session.commit()
-        return apresenta_produto(produto), 200
+        return apresenta_roupa(roupa), 200
 
     except IntegrityError as e:
         # como a duplicidade do nome é a provável razão do IntegrityError
-        error_msg = "Produto de mesmo nome já salvo na base :/"
+        error_msg = "Roupa de mesmo nome já salvo na base :/"
         return {"mesage": error_msg}, 409
 
     except Exception as e:
@@ -56,68 +57,45 @@ def add_produto(form: ProdutoSchema):
         return {"mesage": error_msg}, 400
 
 
-@app.get('/produtos', tags=[produto_tag],
-         responses={"200": ListagemProdutosSchema, "404": ErrorSchema})
-def get_produtos():
-    """Faz a busca por todos os Produto cadastrados
+@app.get('/roupas', tags=[roupa_tag],
+         responses={"200": ListagemRoupasSchema, "404": ErrorSchema})
+def get_roupas():
+    """Faz a busca por todos as Roupas cadastradas
 
-    Retorna uma representação da listagem de produtos.
+    Retorna uma representação da listagem de roupas.
     """
     # criando conexão com a base
     session = Session()
     # fazendo a busca
-    produtos = session.query(Produto).all()
+    roupas = session.query(Roupa).all()
 
-    if not produtos:
-        # se não há produtos cadastrados
-        return {"produtos": []}, 200
+    if not roupas:
+        # se não há roupas cadastradas
+        return {"roupas": []}, 200
     else:
-        # retorna a representação de produto
-        print(produtos)
-        return apresenta_produtos(produtos), 200
+        # retorna a representação de roupas
+        print(roupas)
+        return apresenta_roupas(roupas), 200
 
-
-@app.get('/produto', tags=[produto_tag],
-         responses={"200": ProdutoViewSchema, "404": ErrorSchema})
-def get_produto(query: ProdutoBuscaSchema):
-    """Faz a busca por um Produto a partir do id do produto
-
-    Retorna uma representação dos produtos e comentários associados.
-    """
-    produto_id = query.produto_id
-    # criando conexão com a base
-    session = Session()
-    # fazendo a busca
-    produto = session.query(Produto).filter(Produto.id == produto_id).first()
-
-    if not produto:
-        # se o produto não foi encontrado
-        error_msg = "Produto não encontrado na base :/"
-        return {"mesage": error_msg}, 404
-    else:
-        # retorna a representação de produto
-        return apresenta_produto(produto), 200
-
-
-@app.delete('/produto', tags=[produto_tag],
-            responses={"200": ProdutoDelSchema, "404": ErrorSchema})
-def del_produto(query: ProdutoBuscaSchema):
-    """Deleta um Produto a partir do id informado
+@app.delete('/roupa', tags=[roupa_tag],
+            responses={"200": RoupaDelSchema, "404": ErrorSchema})
+def del_roupa(query: RoupaBuscaSchema):
+    """Deleta uma Roupa a partir do id informado
 
     Retorna uma mensagem de confirmação da remoção.
     """
-    produto_id = query.produto_id
+    id = query.id
 
     # criando conexão com a base
     session = Session()
     # fazendo a remoção
-    count = session.query(Produto).filter(Produto.id == produto_id).delete()
+    count = session.query(Roupa).filter(Roupa.id == id).delete()
     session.commit()
 
     if count:
         # retorna a representação da mensagem de confirmação
-        return {"mesage": "Produto removido", "id": produto_id}
+        return {"mesage": "Roupa removida da lista", "id":id}
     else:
-        # se o produto não foi encontrado
-        error_msg = "Produto não encontrado na base :/"
+        # se a roupa não foi encontrada
+        error_msg = "Roupa não encontrada na base :/"
         return {"mesage": error_msg}, 404
