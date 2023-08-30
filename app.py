@@ -36,7 +36,7 @@ def add_roupa(form: RoupaSchema):
         categoria=form.categoria,
         quantidade=form.quantidade,
         valor=form.valor, tamanho=form.tamanho)
-
+    
     try:
         # criando conexão com a base
         session = Session()
@@ -55,6 +55,43 @@ def add_roupa(form: RoupaSchema):
         # caso um erro fora do previsto
         error_msg = "Não foi possível salvar novo item :/"
         return {"mesage": error_msg}, 400
+    
+@app.put('/roupa', tags=[roupa_tag],
+          responses={"200": RoupaViewSchema, "409": ErrorSchema, "400": ErrorSchema})
+def edit_roupa(form: RoupaEditSchema):
+    """Editar uma Roupa da base de dados
+
+    Retorna uma representação da roupa.
+    """
+    roupa = Roupa(
+        categoria=form.categoria,
+        quantidade=form.quantidade,
+        valor=form.valor, tamanho=form.tamanho)
+ 
+    try:
+        # criando conexão com a base
+        session = Session()
+        # Buscando uma roupa e atualizando a base
+        roupa_selecionada = session.query(Roupa).filter(Roupa.id == form.id).first()
+        roupa_selecionada.categoria = form.categoria
+        roupa_selecionada.quantidade = form.quantidade
+        roupa_selecionada.valor = form.valor
+        roupa_selecionada.tamanho = form.tamanho
+        # efetivando o camando de adição de novo item na tabela
+        session.commit()
+        return apresenta_roupa(roupa), 200
+
+    except IntegrityError as e:
+        # como a duplicidade do nome é a provável razão do IntegrityError
+        error_msg = "Roupa de mesmo nome já salvo na base :/"
+        return {"mesage": error_msg}, 409
+
+    except Exception as e:
+        print(e)
+        # caso um erro fora do previsto
+        error_msg = "Não foi possível salvar novo item :/"
+        return {"mesage": error_msg}, 400
+
 
 
 @app.get('/roupas', tags=[roupa_tag],

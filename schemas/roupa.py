@@ -12,6 +12,15 @@ class RoupaSchema(BaseModel):
     tamanho: str = "M"
     valor: float = 20
 
+class RoupaEditSchema(BaseModel):
+    """ Define como uma roupa é editada
+    """
+    categoria: str = "Camisa"
+    quantidade: int = 5
+    tamanho: str = "M"
+    valor: float = 20
+    id: int = 1
+
 class RoupaBuscaSchema(BaseModel):
     """ Define como deve ser a estrutura que representa a busca. Que será
         feita apenas com base id da roupa.
