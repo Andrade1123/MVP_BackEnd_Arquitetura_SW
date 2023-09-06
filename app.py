@@ -52,6 +52,7 @@ def add_roupa(form: RoupaSchema):
         return {"mesage": error_msg}, 409
 
     except Exception as e:
+        print(e)
         # caso um erro fora do previsto
         error_msg = "Não foi possível salvar novo item :/"
         return {"mesage": error_msg}, 400

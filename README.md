@@ -1,8 +1,15 @@
 # MVP_BackEnd
  ```
- O objetivo é a entrega do MVP que tem como escopo a implementação de um backEnd, com 3x rotas de API e uma tabela de roupas para cadastro, busca e deleção
+ O objetivo é a entrega do MVP que tem como escopo a implementação de um backEnd, com 4x rotas de API e uma tabela de roupas para cadastro, busca, deleção e edição.
  ```
  
+```
+  Para executar o container do Docker do Back-end:
+  - Abra o terminal na pasta do do projeto, e use os comandos.
+  - docker build -t backend
+  - docker run -p 5000:8000 backend
+```
+
 ```
 Para executar os comandos estamos utilizando um ambiente virtual env.
 ```
